@@ -155,12 +155,11 @@ $RECYCLE.BIN/
 *.log
 flyway.production.conf
 application.properties
-huidu-rss-gui/node_modules/*
 log
 dist
 gradle.properties
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
-
-/huidu-rss-core/src/main/generated
+node_modules
+package-lock.json
