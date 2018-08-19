@@ -3,12 +3,13 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "packager": "electron-packager ./ TicketAssistant --platform=win32 --arch=x64 --icon=app.ico --out=./dist --asar --app-version=1.0.0 --overwrite"
   },
   "author": "FatTiger",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^1.8.4"
+    "electron": "^2.0.7"
   },
   "dependencies": {
     "vue": "^2.5.17"
