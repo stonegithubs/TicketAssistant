@@ -1,5 +1,6 @@
 # TicketAssistant
-## 通过electron实现跨平台的票务助手.
+
+## 基于electron实现跨平台的票务助手.
 
 ### 1.组件
 * electron 2.x
@@ -8,7 +9,8 @@
 
 ### 2.项目结构
 1. `src/components`存放`vue`源码.
-2. `static`存放`vue`编译结果.
+2. `src/plugins`存放引用的第三方js.
+3. `static`存放`vue`编译结果.
 
 ### 3.开发环境配置步骤
 1. `node.js`下载地址`https://nodejs.org/en/download/current`.
