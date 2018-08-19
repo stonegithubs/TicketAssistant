@@ -17,6 +17,7 @@
 2. 通过设置环境量`ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"`来指定electron的中国区下载源,不设置默认下载github地址的版本,如果网络无法访问或者超时会导致安装失败.
 3. 项目目录执行`npm install electron -save-dev`安装`electron`.
 4. 项目目录下执行`npm start`启动程序.
+5. 执行`npm config set registry https://registry.npm.taobao.org`设置npm中国区下载源
 
 ### 4.代码规范及约束约定
 
