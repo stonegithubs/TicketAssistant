@@ -5,7 +5,7 @@
 build/
 tmp/
 !/huidu-rss-gui/build/
-
+ 
 # Ignore Gradle GUI config
 gradle-app.setting
 
