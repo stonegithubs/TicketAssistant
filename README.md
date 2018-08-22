@@ -7,6 +7,7 @@
 * vue 2.x
 * TypeScript
 * electron-vue 1.x
+* iView 3.x
 
 ### 2.项目结构
 
@@ -17,6 +18,7 @@
 4. `npm start dev`运行程序.
 
 ### 4.代码规范及约束约定
+1. 所有资源必须引用本地,不可使用CDN等网络资源.
 
 ### 5.打包及部署
 1. 执行`npm run build`后编译结果在`build`文件夹
