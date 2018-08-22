@@ -164,4 +164,3 @@ gradle.properties
 node_modules
 package-lock.json
 .babelrc
-.electron-vue
