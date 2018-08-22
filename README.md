@@ -7,6 +7,7 @@
 * vue 2.x
 * TypeScript
 * electron-vue 1.x
+* iView 3.x
 
 ### 2.项目结构
 
