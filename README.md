@@ -1,6 +1,6 @@
 # TicketAssistant
 
-## 基于electron实现跨平台的票务助手.
+## 基于electron-vue实现跨平台的票务助手.
 
 ### 1.组件
 * electron 2.x
