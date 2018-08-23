@@ -4,8 +4,9 @@
  <h1>Fuck The World</h1>
 </template>
 <script>
- var http = require("http");
-//获取主进程窗口
+export default {
+  e() {
+    //获取主进程窗口
     const mainWindow = require("electron").remote.getCurrentWindow();
     //获取主进程BrowserWindow对象
     const { BrowserWindow } = require("electron").remote;
@@ -18,10 +19,6 @@
     child.once("ready-to-show", () => {
       child.show();
     });
-    http.ClientRequest
-export default {
-  e() {
-    
     var http = require("http");
     var querystring = require("querystring");
     var options = {

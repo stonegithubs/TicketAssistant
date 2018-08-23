@@ -3,6 +3,7 @@
 ## 基于electron-vue实现跨平台的票务助手.
 
 ### 1.组件
+* node.js 10.9.0
 * electron 2.x
 * vue 2.x
 * TypeScript
