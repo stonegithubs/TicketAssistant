@@ -13,6 +13,9 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
+//定义全局变量
+global.mainURL = winURL;
+
 function createWindow() {
   /**
    * Initial window options
