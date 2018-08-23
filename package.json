@@ -13,7 +13,7 @@
     "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
     "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
     "dev": "node .electron-vue/dev-runner.js",
-    "pack": "npm run pack:main && npm run pack:renderer",
+    "pack": "yarn run pack:main && npm run pack:renderer",
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "postinstall": ""
@@ -23,7 +23,8 @@
     "iview": "^3.0.1",
     "vue": "^2.5.17",
     "vue-electron": "^1.0.6",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "yarn": "^1.9.4"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
