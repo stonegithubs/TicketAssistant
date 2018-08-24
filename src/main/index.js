@@ -13,13 +13,20 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
+
+
+
 //定义全局变量
 global.mainURL = winURL;
+//定义12306网站所有接口
+global.kyfwURL = "https://kyfw.12306.cn";
+global.kyfwAPI = {
+  getCaptchaImage: kyfwURL + "/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand",
+  captchaCheck: kyfwURL + "/passport/captcha/captcha-check"
+}
+
 
 function createWindow() {
-  /**
-   * Initial window options
-   */
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
