@@ -24,7 +24,7 @@ export default {
         modal: true
       });
       //跳转到登录
-      child.loadURL(mainURL + "/#/login");
+      child.loadURL(mainURL + "#/login");
       child.once("ready-to-show", () => {
         child.show();
       });
@@ -36,7 +36,7 @@ export default {
         host: "127.0.0.1", // google.com
         port: 80,
         path: path, // /upload
-        method: "GET", 
+        method: "GET",
         headers: {
           "Content-Type": "application/json"
         }

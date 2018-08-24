@@ -7,6 +7,7 @@
 </div>
 </template>
 <script>
+import iconPath from '@/images/icon_ok.png'
 export default {
   data() {
     return {
@@ -32,7 +33,7 @@ export default {
         cxt.drawImage(that.img, 0, 0);
       };
       this.icon = new Image();
-      this.icon.src = "./src/renderer/images/icon_ok.png";
+      this.icon.src = iconPath;
     },
     addEvents: function() {
       var that = this;
