@@ -35,7 +35,7 @@ export default {
       var options = {
         host: "127.0.0.1", // google.com
         port: 80,
-        path: path, eg:/upload
+        path: path, // /upload
         method: "GET", 
         headers: {
           "Content-Type": "application/json"
