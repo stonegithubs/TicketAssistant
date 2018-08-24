@@ -24,12 +24,12 @@ export default {
       //获取主进程定义的kyfwURL对象
       const kyfwAPI = require("electron").remote.getGlobal("kyfwAPI");
       var canvas = document.getElementById("canvas");
-      var ctx = canvas.getContext("2d");
+      var cxt = canvas.getContext("2d");
       this.img = new Image();
       this.img.src = kyfwAPI.getCaptchaImage;
       var that = this;
       this.img.onload = function() {
-        ctx.drawImage(that.img, 0, 0);
+        cxt.drawImage(that.img, 0, 0);
       };
     },
     addEvents: function() {
@@ -51,6 +51,7 @@ export default {
       }
       y -= 30;
 
+      var flag = false;
       this.coordinates.forEach((item, index) => {
         //判断是否重复点击了已点击的点(判断此次点击的坐标是否在坐标的画图范围内)
         if (
@@ -63,24 +64,31 @@ export default {
           this.coordinates.splice(index, 1);
           //重新绘制
           this.canvasRect(canvas);
-          break;
+          flag = true;
+          return;
         }
       });
-     
+      if (flag == true) {
+        return;
+      }
       this.coordinates.push({ x: x, y: y });
       //重新绘制
       this.canvasRect(canvas);
       console.log(this.coordinates);
     },
     canvasRect: function(canvas) {
-      var ctx = canvas.getContext("2d");
-      ctx.fillStyle = "#FF0000";
+      var cxt = canvas.getContext("2d");
+      cxt.fillStyle = "#FF0000";
+      //清空画布
+      cxt.clearRect(0, 0, canvas.width, canvas.height);
+      //绘制图片
+      cxt.drawImage(this.img, 0, 0);
       //根据坐标集合画圆
       this.coordinates.forEach((item, index) => {
-        ctx.beginPath();
-        ctx.arc(item.x, item.y + 30, 10, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.closePath();
+        cxt.beginPath();
+        cxt.arc(item.x, item.y + 30, 10, 0, 2 * Math.PI);
+        cxt.fill();
+        cxt.closePath();
       });
     }
   }
