@@ -31,6 +31,8 @@ export default {
       this.img.onload = function() {
         cxt.drawImage(that.img, 0, 0);
       };
+      this.icon = new Image();
+      this.icon.src = "./src/renderer/images/icon_ok.png";
     },
     addEvents: function() {
       var that = this;
@@ -83,12 +85,16 @@ export default {
       cxt.clearRect(0, 0, canvas.width, canvas.height);
       //绘制图片
       cxt.drawImage(this.img, 0, 0);
+      var that = this;
       //根据坐标集合画圆
       this.coordinates.forEach((item, index) => {
-        cxt.beginPath();
-        cxt.arc(item.x, item.y + 30, 10, 0, 2 * Math.PI);
-        cxt.fill();
-        cxt.closePath();
+        //画图
+        cxt.drawImage(that.icon, item.x - 7, item.y + 23);
+        //画圆点
+        // cxt.beginPath();
+        // cxt.arc(item.x, item.y + 30, 10, 0, 2 * Math.PI);
+        // cxt.fill();
+        // cxt.closePath();
       });
     }
   }
