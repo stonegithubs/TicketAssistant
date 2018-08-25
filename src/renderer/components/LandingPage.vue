@@ -1,7 +1,7 @@
 <style scoped>
 </style>
 <template>
- <h1>Fuck The World</h1>
+  <h1>Fuck The World</h1>
 </template>
 <script>
 export default {
@@ -21,7 +21,9 @@ export default {
       //定义一个子窗口,继承自主渲染进程
       let child = new BrowserWindow({
         parent: mainWindow,
-        modal: true
+        modal: true,
+        width:400,
+        height:700
       });
       //跳转到登录
       child.loadURL(mainURL + "#/login");

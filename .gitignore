@@ -164,3 +164,4 @@ gradle.properties
 node_modules
 package-lock.json
 .babelrc
+src/renderer/images/captcha.jpg
