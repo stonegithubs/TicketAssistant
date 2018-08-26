@@ -5,7 +5,8 @@
     <br>
     <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
     <br>
-    <canvas style="border:1px solid black" id="canvas" width="293" height="190"></canvas>
+    <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190"></canvas>
+    <br>
     <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
     <Button v-on:click="captchaCheck" type="primary">Login</Button>
   </div>
@@ -50,6 +51,34 @@ export default {
     this.refreshCaptcha();
   },
   methods: {
+    login: function() {
+      var that = this;
+      var content = {
+        username: this.account,
+        password: this.password,
+        appid: "otn"
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: kyfwAPI.login,
+        cookie: this.cookie
+      };
+      this.help(
+        options,
+        content,
+        function(data, response) {
+          if (data.result_code != 0) {
+            that.$Message.error(data.result_message);
+            that.refreshCaptcha();
+            return;
+          }
+          that.$Message.info(data.result_message);
+        },
+        function(e) {
+          that.$Message.error(e.message);
+        }
+      );
+    },
     refreshCaptcha: function() {
       this.coordinates = [];
       var that = this;
@@ -59,6 +88,17 @@ export default {
         rand: "sjrand"
       };
       var content = querystring.stringify(requestData);
+      var options = {
+        hostname: kyfwAPI.root,
+        port: 443,
+        path: kyfwAPI.login,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          Cookie: this.cookie
+        }
+      };
+      var that = this;
 
       request(kyfwAPI.getCaptchaImage, function(err, res, body) {
         //设置cookie
@@ -90,48 +130,47 @@ export default {
       this.coordinates.forEach((item, index) => {
         answer += item.x + "," + item.y + ",";
       });
-      var requestData = {
+      var content = {
         answer: answer.substring(0, answer.length - 1),
         login_site: "E",
         rand: "sjrand"
       };
-      var content = querystring.stringify(requestData);
+
       var options = {
         hostname: kyfwAPI.root,
-        port: 443,
         path: kyfwAPI.captchaCheck,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Cookie: this.cookie
-        }
+        cookie: this.cookie
       };
       var that = this;
 
-      //   var j = request.jar();
-      //   var cookie = request.cookie(that.cookie);
-      //   j.setCookie(cookie, kyfwAPI.captchaCheck, function(err, cookie) {});
-
-      //   var options = {
-      //     url: kyfwAPI.captchaCheck,
-      //     headers: {
-      //       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-      //     }
-      //   };
-      //   console.log(this.cookie);
-      //   request({ url: kyfwAPI.captchaCheck, jar: j }, function() {
-      //     request(options, function(error, response, body) {
-      //       var data = JSON.parse(body);
-      //       if (data.result_code != 4) {
-      //         that.$Message.error(data.result_message);
-      //         that.refreshCaptcha();
-      //         return;
-      //       }
-      //       that.$Message.info(data.result_message);
-      //     });
-      //   });
-
-      var request = https.request(options, function(response) {
+      this.help(
+        options,
+        content,
+        function(data, response) {
+          if (data.result_code != 4) {
+            that.$Message.error(data.result_message);
+            that.refreshCaptcha();
+            return;
+          }
+          that.login();
+        },
+        function(e) {
+          that.$Message.error(e.message);
+        }
+      );
+    },
+    help: function(options, content, successCallback, errorCallback) {
+      var opt = {
+        hostname: options.hostname,
+        port: 443,
+        path: options.path,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          Cookie: options.cookie
+        }
+      };
+      var request = https.request(opt, function(response) {
         response.setEncoding("utf8");
         var body = "";
         response.on("data", function(result) {
@@ -139,17 +178,12 @@ export default {
         });
         response.on("end", function() {
           var data = JSON.parse(body);
-          if (data.result_code != 4) {
-            that.$Message.error(data.result_message);
-            that.refreshCaptcha();
-            return;
-          }
-          that.$Message.info(data.result_message);
+          successCallback(data, response);
         });
       });
-      request.write(content);
+      request.write(querystring.stringify(content));
       request.on("error", function(e) {
-        that.$Message.error(e.message);
+        errorCallback(e);
       });
       request.end();
     },

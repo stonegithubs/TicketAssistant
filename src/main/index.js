@@ -27,7 +27,8 @@ global.root = "https://kyfw.12306.cn";
 global.kyfwAPI = {
   root: "kyfw.12306.cn",
   getCaptchaImage: global.root + "/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand",
-  captchaCheck: "/passport/captcha/captcha-check"
+  captchaCheck: "/passport/captcha/captcha-check",
+  login:"/passport/web/login"
 }
 
 
