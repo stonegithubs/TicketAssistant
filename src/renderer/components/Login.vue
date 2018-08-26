@@ -1,7 +1,6 @@
 <template>
-
   <div align="center">
-    <Input v-model="account" placeholder="12306 account" style="width: 293px" />
+    <Input v-model="account" placeholder="account" style="width: 293px" />
     <br>
     <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
     <br>
@@ -12,15 +11,17 @@
   </div>
 </template>
 <script>
-import iconPath from "@/images/icon_ok.png";
+import icon from "@/images/icon_ok.png";
 const https = require("https");
 const fs = require("fs");
 const request = require("request");
 const querystring = require("querystring");
-//const zlib = require("zlib");
+const { ipcRenderer, remote } = require("electron");
 //获取主进程定义的kyfwAPI对象
-const kyfwAPI = require("electron").remote.getGlobal("kyfwAPI");
-
+const kyfwAPI = remote.getGlobal("kyfwAPI");
+const kyfwCookies = remote.getGlobal("kyfwCookies");
+//获取当前网页窗口
+const currentWindow = remote.getCurrentWindow();
 export default {
   data() {
     return {
@@ -30,19 +31,16 @@ export default {
       account: "",
       password: "",
       canvas: null,
-      cookie: "",
       captchaImgPath: "./src/renderer/images/captcha.jpg",
-      cxt: null,
-      cookieJar: null
+      cxt: null
     };
   },
   mounted: function() {
     this.canvas = document.getElementById("canvas");
     this.cxt = this.canvas.getContext("2d");
     this.captchaIcon = new Image();
-    this.captchaIcon.src = iconPath;
+    this.captchaIcon.src = icon;
     this.captchaImg = new Image();
-    this.cookieJar = request.jar();
     var that = this;
     // 监听点击事件
     this.canvas.addEventListener("click", function(event) {
@@ -51,6 +49,46 @@ export default {
     this.refreshCaptcha();
   },
   methods: {
+    //将set-cookie headers转换为cookie字符串
+    getCookie: function(cookies, headerCookies) {
+      var cookieArray = [];
+      if (cookies != null && cookies != "") {
+        cookies.split(";").forEach((item, index) => {
+          var splitResult = item.split("=");
+          cookieArray.push({
+            key: splitResult[0],
+            value: splitResult[1]
+          });
+        });
+      }
+      if (headerCookies != null && headerCookies != "") {
+        headerCookies.forEach((item, index) => {
+          var cookieResult = item.split(";")[0];
+          var splitResult = cookieResult.split("=");
+          var key = splitResult[0];
+          var value = splitResult[1];
+          var flag = false;
+          cookieArray.some((temp, tempIndex) => {
+            if (temp.key == key) {
+              temp.value = value;
+              flag = true;
+              return true;
+            }
+          });
+          if (!flag) {
+            cookieArray.push({
+              key: key,
+              value: value
+            });
+          }
+        });
+      }
+      var cookie = "";
+      cookieArray.forEach((item, index) => {
+        cookie += item.key + "=" + item.value + ";";
+      });
+      return cookie.substring(0, cookie.length - 1);
+    },
     login: function() {
       var that = this;
       var content = {
@@ -61,18 +99,27 @@ export default {
       var options = {
         hostname: kyfwAPI.root,
         path: kyfwAPI.login,
-        cookie: this.cookie
+        cookie: kyfwCookies
       };
       this.help(
         options,
         content,
         function(data, response) {
-          if (data.result_code != 0) {
-            that.$Message.error(data.result_message);
-            that.refreshCaptcha();
+          if (data.result_code == 0) {
+            //设置cookie
+            kyfwCookies = that.getCookie(
+              kyfwCookies,
+              response.headers["set-cookie"]
+            );
+            //向主进程发送用户登录事件
+            ipcRenderer.send("login-event");
+            //关闭当前窗口
+            currentWindow.close();
             return;
           }
-          that.$Message.info(data.result_message);
+          that.$Message.error(data.result_message);
+          //登录失败重新刷新验证码
+          that.refreshCaptcha();
         },
         function(e) {
           that.$Message.error(e.message);
@@ -80,8 +127,8 @@ export default {
       );
     },
     refreshCaptcha: function() {
-      this.coordinates = [];
       var that = this;
+      this.coordinates = [];
       var requestData = {
         module: "login",
         login_site: "E",
@@ -95,19 +142,12 @@ export default {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Cookie: this.cookie
+          Cookie: kyfwCookies
         }
       };
-      var that = this;
-
       request(kyfwAPI.getCaptchaImage, function(err, res, body) {
         //设置cookie
-        var cookies = res.headers["set-cookie"];
-        that.cookie = "";
-        cookies.forEach((item, index) => {
-          that.cookie += item.split(";")[0] + ";";
-        });
-        that.cookie = that.cookie.substring(0, that.cookie.length - 1);
+        kyfwCookies = that.getCookie(kyfwCookies, res.headers["set-cookie"]);
       })
         .pipe(fs.createWriteStream(that.captchaImgPath))
         .on("close", function() {
@@ -126,6 +166,7 @@ export default {
         });
     },
     captchaCheck: function() {
+      var that = this;
       var answer = "";
       this.coordinates.forEach((item, index) => {
         answer += item.x + "," + item.y + ",";
@@ -135,24 +176,22 @@ export default {
         login_site: "E",
         rand: "sjrand"
       };
-
       var options = {
         hostname: kyfwAPI.root,
         path: kyfwAPI.captchaCheck,
-        cookie: this.cookie
+        cookie: kyfwCookies
       };
-      var that = this;
-
       this.help(
         options,
         content,
         function(data, response) {
-          if (data.result_code != 4) {
-            that.$Message.error(data.result_message);
-            that.refreshCaptcha();
+          if (data.result_code == 4) {
+            that.login();
             return;
           }
-          that.login();
+          that.$Message.error(data.result_message);
+          //验证失败重新刷新验证码
+          that.refreshCaptcha();
         },
         function(e) {
           that.$Message.error(e.message);

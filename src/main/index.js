@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu } from 'electron'
+import { app, BrowserWindow, Menu, ipcMain } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -13,22 +13,25 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
-
-
-
-
-
+//监听用户登录消息,同时向所有关注了用户登录事件的渲染进程发布消息
+ipcMain.on("login-event", (event, arg) => {
+  //event.sender.send向发送消息的渲染进程回复消息
+  //mainWindow.webContents.send向所有监听当前事件的子窗口发送消息
+  mainWindow.webContents.send("login-event")
+})
 
 
 //定义全局变量
 global.mainURL = winURL;
 global.root = "https://kyfw.12306.cn";
+//定义cookies 这里不需要使用electron提供的session.defaultSession.cookies
+global.kyfwCookies = null;
 //定义12306网站所有接口
 global.kyfwAPI = {
   root: "kyfw.12306.cn",
   getCaptchaImage: global.root + "/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand",
   captchaCheck: "/passport/captcha/captcha-check",
-  login:"/passport/web/login"
+  login: "/passport/web/login"
 }
 
 
