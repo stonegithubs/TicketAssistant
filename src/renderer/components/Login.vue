@@ -5,19 +5,21 @@
     <br>
     <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
     <br>
-    <canvas id="canvas" width="293" height="190"></canvas>
+    <canvas style="border:1px solid black" id="canvas" width="293" height="190"></canvas>
     <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
     <Button v-on:click="captchaCheck" type="primary">Login</Button>
   </div>
 </template>
 <script>
 import iconPath from "@/images/icon_ok.png";
-const http = require("http");
+const https = require("https");
 const fs = require("fs");
 const request = require("request");
 const querystring = require("querystring");
+//const zlib = require("zlib");
 //获取主进程定义的kyfwAPI对象
 const kyfwAPI = require("electron").remote.getGlobal("kyfwAPI");
+
 export default {
   data() {
     return {
@@ -29,7 +31,8 @@ export default {
       canvas: null,
       cookie: "",
       captchaImgPath: "./src/renderer/images/captcha.jpg",
-      cxt: null
+      cxt: null,
+      cookieJar: null
     };
   },
   mounted: function() {
@@ -37,6 +40,8 @@ export default {
     this.cxt = this.canvas.getContext("2d");
     this.captchaIcon = new Image();
     this.captchaIcon.src = iconPath;
+    this.captchaImg = new Image();
+    this.cookieJar = request.jar();
     var that = this;
     // 监听点击事件
     this.canvas.addEventListener("click", function(event) {
@@ -54,31 +59,31 @@ export default {
         rand: "sjrand"
       };
       var content = querystring.stringify(requestData);
-      var uri =
-        "https://" + kyfwAPI.root + kyfwAPI.getCaptchaImage + "?" + content;
-      request.head(uri, function(err, res, body) {
-        request(uri)
-          .pipe(fs.createWriteStream(that.captchaImgPath))
-          .on("close", function() {
-            that.captchaImg = new Image();
-            that.captchaImg.src = that.captchaImgPath;
-            //当图片加载完成时绘制canvas
-            that.captchaImg.onload = function() {
-              that.cxt.drawImage(that.captchaImg, 0, 0);
-            };
-            //设置cookie
-            var cookies = res.headers["set-cookie"];
-            that.cookie = "";
-            cookies.forEach((item, index) => {
-              that.cookie += item.split(";")[0] + ";";
-            });
-            that.cookie = that.cookie.substring(0, that.cookie.length - 1);
-            console.log(that.cookie);
-          })
-          .on("error", function() {
-            that.$Message.error(e.message);
-          });
-      });
+
+      request(kyfwAPI.getCaptchaImage, function(err, res, body) {
+        //设置cookie
+        var cookies = res.headers["set-cookie"];
+        that.cookie = "";
+        cookies.forEach((item, index) => {
+          that.cookie += item.split(";")[0] + ";";
+        });
+        that.cookie = that.cookie.substring(0, that.cookie.length - 1);
+      })
+        .pipe(fs.createWriteStream(that.captchaImgPath))
+        .on("close", function() {
+          //加上随机数防止浏览器缓存
+          that.captchaImg.src =
+            that.captchaImgPath +
+            "?random=" +
+            Math.floor(Math.random() * 100 + 1);
+          //当图片加载完成时绘制canvas
+          that.captchaImg.onload = function() {
+            that.cxt.drawImage(that.captchaImg, 0, 0);
+          };
+        })
+        .on("error", function() {
+          that.$Message.error(e.message);
+        });
     },
     captchaCheck: function() {
       var answer = "";
@@ -93,7 +98,7 @@ export default {
       var content = querystring.stringify(requestData);
       var options = {
         hostname: kyfwAPI.root,
-        port: 80,
+        port: 443,
         path: kyfwAPI.captchaCheck,
         method: "POST",
         headers: {
@@ -102,15 +107,44 @@ export default {
         }
       };
       var that = this;
-      var request = http.request(options, function(response) {
-        console.log("STATUS: " + response.statusCode);
-        console.log("HEADERS: " + JSON.stringify(response.headers));
+
+      //   var j = request.jar();
+      //   var cookie = request.cookie(that.cookie);
+      //   j.setCookie(cookie, kyfwAPI.captchaCheck, function(err, cookie) {});
+
+      //   var options = {
+      //     url: kyfwAPI.captchaCheck,
+      //     headers: {
+      //       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+      //     }
+      //   };
+      //   console.log(this.cookie);
+      //   request({ url: kyfwAPI.captchaCheck, jar: j }, function() {
+      //     request(options, function(error, response, body) {
+      //       var data = JSON.parse(body);
+      //       if (data.result_code != 4) {
+      //         that.$Message.error(data.result_message);
+      //         that.refreshCaptcha();
+      //         return;
+      //       }
+      //       that.$Message.info(data.result_message);
+      //     });
+      //   });
+
+      var request = https.request(options, function(response) {
         response.setEncoding("utf8");
+        var body = "";
         response.on("data", function(result) {
-          var data = JSON.parse(result);
+          body += result;
+        });
+        response.on("end", function() {
+          var data = JSON.parse(body);
           if (data.result_code != 4) {
             that.$Message.error(data.result_message);
+            that.refreshCaptcha();
+            return;
           }
+          that.$Message.info(data.result_message);
         });
       });
       request.write(content);
@@ -151,7 +185,7 @@ export default {
       if (flag) {
         return;
       }
-      this.coordinates.push({ x: x, y: y });
+      this.coordinates.push({ x: Math.floor(x), y: Math.floor(y) });
       //重新绘制
       this.canvasRect(canvas);
     },

@@ -30,28 +30,6 @@ export default {
       child.once("ready-to-show", () => {
         child.show();
       });
-    },
-    e: function() {
-      var http = require("http");
-      var querystring = require("querystring");
-      var options = {
-        host: "127.0.0.1", // google.com
-        port: 80,
-        path: path, // /upload
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      };
-      http.get(options, function(res) {
-        var resData = "";
-        res.on("data", function(data) {
-          resData += data;
-        });
-        res.on("end", function() {
-          callback(null, JSON.parse(resData));
-        });
-      });
     }
   }
 };

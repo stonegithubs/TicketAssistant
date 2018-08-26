@@ -22,10 +22,11 @@ const winURL = process.env.NODE_ENV === 'development'
 
 //定义全局变量
 global.mainURL = winURL;
+global.root = "https://kyfw.12306.cn";
 //定义12306网站所有接口
 global.kyfwAPI = {
   root: "kyfw.12306.cn",
-  getCaptchaImage: "/passport/captcha/captcha-image",
+  getCaptchaImage: global.root + "/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand",
   captchaCheck: "/passport/captcha/captcha-check"
 }
 
