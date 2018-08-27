@@ -6,9 +6,11 @@ import router from './router'
 
 import iView from 'iview';    //引入UI框架
 import 'iview/dist/styles/iview.css';
-
+import https from './utils/request';
+import cookie from './utils/cookie';
 Vue.use(iView);
-
+Vue.use(https);
+Vue.use(cookie);
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
