@@ -19,7 +19,7 @@ const querystring = require("querystring");
 const { ipcRenderer, remote } = require("electron");
 //获取主进程定义的kyfwAPI对象
 const kyfwAPI = remote.getGlobal("kyfwAPI");
-const kyfwCookies = remote.getGlobal("kyfwCookies");
+var kyfwCookies = remote.getGlobal("kyfwCookies");
 //获取当前网页窗口
 const currentWindow = remote.getCurrentWindow();
 export default {

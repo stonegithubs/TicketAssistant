@@ -4,7 +4,7 @@
   <h1>I Love The World</h1>
 </template>
 <script>
-//获取主进程BrowserWindow对象
+//获取主进程BrowserWigit pndow对象
 const { remote, ipcRenderer } = require("electron");
 const BrowserWindow = remote.BrowserWindow;
 //获取当前网页窗口
