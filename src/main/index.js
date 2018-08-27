@@ -24,22 +24,21 @@ ipcMain.on("login-event", (event, arg) => {
 //定义全局变量
 global.mainURL = winURL;
 global.root = "https://kyfw.12306.cn";
-//定义cookies 这里不需要使用electron提供的session.defaultSession.cookies
-global.kyfwCookies = null;
 //定义12306网站所有接口
 global.kyfwAPI = {
   root: "kyfw.12306.cn",
   getCaptchaImage: global.root + "/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand",
   captchaCheck: "/passport/captcha/captcha-check",
-  login: "/passport/web/login"
+  login: "/passport/web/login",
+  query: "/otn/leftTicket/query"
 }
 
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 800,
     useContentSize: true,
-    width: 1000,
+    width: 1500,
     show: false
   })
   mainWindow.setMenu

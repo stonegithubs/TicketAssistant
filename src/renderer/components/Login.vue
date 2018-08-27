@@ -4,7 +4,7 @@
     <br>
     <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
     <br>
-    <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190"></canvas>
+    <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190" />
     <br>
     <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
     <Button v-on:click="captchaCheck" type="primary">Login</Button>
@@ -12,14 +12,12 @@
 </template>
 <script>
 import icon from "@/images/icon_ok.png";
-const https = require("https");
 const fs = require("fs");
 const request = require("request");
-const querystring = require("querystring");
 const { ipcRenderer, remote } = require("electron");
 //获取主进程定义的kyfwAPI对象
 const kyfwAPI = remote.getGlobal("kyfwAPI");
-var kyfwCookies = remote.getGlobal("kyfwCookies");
+
 //获取当前网页窗口
 const currentWindow = remote.getCurrentWindow();
 export default {
@@ -49,46 +47,6 @@ export default {
     this.refreshCaptcha();
   },
   methods: {
-    //将set-cookie headers转换为cookie字符串
-    getCookie: function(cookies, headerCookies) {
-      var cookieArray = [];
-      if (cookies != null && cookies != "") {
-        cookies.split(";").forEach((item, index) => {
-          var splitResult = item.split("=");
-          cookieArray.push({
-            key: splitResult[0],
-            value: splitResult[1]
-          });
-        });
-      }
-      if (headerCookies != null && headerCookies != "") {
-        headerCookies.forEach((item, index) => {
-          var cookieResult = item.split(";")[0];
-          var splitResult = cookieResult.split("=");
-          var key = splitResult[0];
-          var value = splitResult[1];
-          var flag = false;
-          cookieArray.some((temp, tempIndex) => {
-            if (temp.key == key) {
-              temp.value = value;
-              flag = true;
-              return true;
-            }
-          });
-          if (!flag) {
-            cookieArray.push({
-              key: key,
-              value: value
-            });
-          }
-        });
-      }
-      var cookie = "";
-      cookieArray.forEach((item, index) => {
-        cookie += item.key + "=" + item.value + ";";
-      });
-      return cookie.substring(0, cookie.length - 1);
-    },
     login: function() {
       var that = this;
       var content = {
@@ -99,18 +57,15 @@ export default {
       var options = {
         hostname: kyfwAPI.root,
         path: kyfwAPI.login,
-        cookie: kyfwCookies
+        cookie: that.global.cookie
       };
-      this.help(
+      this.post(
         options,
         content,
         function(data, response) {
           if (data.result_code == 0) {
             //设置cookie
-            kyfwCookies = that.getCookie(
-              kyfwCookies,
-              response.headers["set-cookie"]
-            );
+            that.refreshCookie(response.headers["set-cookie"]);
             //向主进程发送用户登录事件
             ipcRenderer.send("login-event");
             //关闭当前窗口
@@ -129,25 +84,9 @@ export default {
     refreshCaptcha: function() {
       var that = this;
       this.coordinates = [];
-      var requestData = {
-        module: "login",
-        login_site: "E",
-        rand: "sjrand"
-      };
-      var content = querystring.stringify(requestData);
-      var options = {
-        hostname: kyfwAPI.root,
-        port: 443,
-        path: kyfwAPI.login,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Cookie: kyfwCookies
-        }
-      };
       request(kyfwAPI.getCaptchaImage, function(err, res, body) {
         //设置cookie
-        kyfwCookies = that.getCookie(kyfwCookies, res.headers["set-cookie"]);
+        that.refreshCookie(res.headers["set-cookie"]);
       })
         .pipe(fs.createWriteStream(that.captchaImgPath))
         .on("close", function() {
@@ -179,9 +118,9 @@ export default {
       var options = {
         hostname: kyfwAPI.root,
         path: kyfwAPI.captchaCheck,
-        cookie: kyfwCookies
+        cookie: that.global.cookie
       };
-      this.help(
+      this.post(
         options,
         content,
         function(data, response) {
@@ -197,34 +136,6 @@ export default {
           that.$Message.error(e.message);
         }
       );
-    },
-    help: function(options, content, successCallback, errorCallback) {
-      var opt = {
-        hostname: options.hostname,
-        port: 443,
-        path: options.path,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-          Cookie: options.cookie
-        }
-      };
-      var request = https.request(opt, function(response) {
-        response.setEncoding("utf8");
-        var body = "";
-        response.on("data", function(result) {
-          body += result;
-        });
-        response.on("end", function() {
-          var data = JSON.parse(body);
-          successCallback(data, response);
-        });
-      });
-      request.write(querystring.stringify(content));
-      request.on("error", function(e) {
-        errorCallback(e);
-      });
-      request.end();
     },
     canvasClickEvent: function(canvas, event) {
       //鼠标点击时获取坐标
