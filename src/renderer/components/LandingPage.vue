@@ -115,7 +115,7 @@ export default {
     ipcRenderer.on("login-event", (event, arg) => {
       that.$Message.info("您已成功登录");
     });
-    this.showLogin();
+    //this.showLogin();
   },
   methods: {
     query: function() {
@@ -138,10 +138,6 @@ export default {
           if (data.status) {
             //设置cookie
             that.refreshCookie(response.headers["set-cookie"]);
-            //向主进程发送用户登录事件
-            ipcRenderer.send("login-event");
-            //关闭当前窗口
-            currentWindow.close();
             return;
           }
           that.$Message.error(data.result_message);

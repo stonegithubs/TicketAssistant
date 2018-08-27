@@ -15,7 +15,10 @@ export default {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                            Cookie: options.cookie
+                            Cookie: options.cookie,
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
+                            "Cache-Control": "no-cache",
+                            "If-Modified-Since": "0"
                         }
                     };
                     var request = https.request(opt, function (response) {
@@ -41,21 +44,22 @@ export default {
                     var that = this;
                     this.$Spin.show();
                     var path = options.path + "?" + querystring.stringify(content);
-                    console.log(path);
                     var opt = {
-                        hostname: options.hostname,
+                        hostname: "kyfw.12306.cn",
                         port: 443,
                         path: path,
                         method: "GET",
                         headers: {
-                            Cookie: options.cookie
+                            Cookie: options.cookie,
+                            "Cache-Control": "no-cache",
+                            "If-Modified-Since": "0",
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
                         }
                     };
-                    console.log(opt);
                     var request = https.request(opt, (response) => {
                         response.setEncoding("utf8");
                         var body = "";
-                        response.on("data", function (result) {
+                        response.on("data", (result) => {
                             body += result;
                         });
                         response.on("end", function () {
@@ -64,7 +68,7 @@ export default {
                             successCallback(data, response);
                         });
                     })
-                    request.on('error', (e) => {
+                    request.on("error", (e) => {
                         that.$Spin.hide();
                         errorCallback(e);
                     });
