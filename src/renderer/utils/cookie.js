@@ -4,10 +4,11 @@ export default {
         Vue.mixin({
             methods: {
                 //将set-cookie headers转换为cookie字符串
-                refreshCookie: function (cookies, headerCookies) {
+                refreshCookie: function (headerCookies) {
+                    var that = this;
                     var cookieArray = [];
-                    if (cookies != null && cookies != "") {
-                        cookies.split(";").forEach((item, index) => {
+                    if (that.global.cookie != null && that.global.cookie != "") {
+                        that.global.cookie.split(";").forEach((item, index) => {
                             var splitResult = item.split("=");
                             cookieArray.push({
                                 key: splitResult[0],
@@ -41,7 +42,7 @@ export default {
                     cookieArray.forEach((item, index) => {
                         cookie += item.key + "=" + item.value + ";";
                     });
-                    return cookie.substring(0, cookie.length - 1);
+                    that.global.cookie = cookie.substring(0, cookie.length - 1);
                 }
             }
         });

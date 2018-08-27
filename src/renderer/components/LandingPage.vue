@@ -3,12 +3,20 @@
 <template>
   <div class="layout">
     <Layout>
-      <Header>Header</Header>
+      <Header style="background:white">
+      </Header>
       <Content>
+        <Checkbox>GC-高铁/城际</Checkbox>
+        <Checkbox>D-动车</Checkbox>
+        <Checkbox>Z-直达</Checkbox>
+        <Checkbox>T-特快</Checkbox>
+        <Checkbox>K-快速</Checkbox>
+        <Checkbox>其他</Checkbox>
+        <Button v-on:click="query" type="primary">Query</Button>
         <Table stripe :columns="columns" :data="data" />
       </Content>
+      <Footer style="text-align:center">© 2018-2018 Spardag</Footer>
     </Layout>
-
   </div>
 </template>
 <script>
@@ -19,7 +27,8 @@ const BrowserWindow = remote.BrowserWindow;
 const currentWindow = remote.getCurrentWindow();
 //获取主进程定义的mainURL对象
 const mainURL = remote.getGlobal("mainURL");
-
+//获取主进程定义的kyfwAPI对象
+const kyfwAPI = remote.getGlobal("kyfwAPI");
 export default {
   data() {
     return {
@@ -109,6 +118,39 @@ export default {
     this.showLogin();
   },
   methods: {
+    query: function() {
+      var that = this;
+      var content = {
+        "leftTicketDTO.train_date": "2018-09-06",
+        "leftTicketDTO.from_station": "BJP",
+        "leftTicketDTO.to_station": "SHH",
+        purpose_codes: "ADULT"
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: kyfwAPI.query,
+        cookie: that.global.cookie
+      };
+      this.get(
+        options,
+        content,
+        function(data, response) {
+          if (data.status) {
+            //设置cookie
+            that.refreshCookie(response.headers["set-cookie"]);
+            //向主进程发送用户登录事件
+            ipcRenderer.send("login-event");
+            //关闭当前窗口
+            currentWindow.close();
+            return;
+          }
+          that.$Message.error(data.result_message);
+        },
+        function(e) {
+          that.$Message.error(e.message);
+        }
+      );
+    },
     showLogin: function() {
       //定义一个子窗口,继承自主渲染进程
       let child = new BrowserWindow({

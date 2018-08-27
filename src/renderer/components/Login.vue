@@ -1,14 +1,14 @@
 <template>
-    <div align="center">
-        <Input v-model="account" placeholder="account" style="width: 293px" />
-        <br>
-        <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
-        <br>
-        <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190" />
-        <br>
-        <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
-        <Button v-on:click="captchaCheck" type="primary">Login</Button>
-    </div>
+  <div align="center">
+    <Input v-model="account" placeholder="account" style="width: 293px" />
+    <br>
+    <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
+    <br>
+    <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190" />
+    <br>
+    <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
+    <Button v-on:click="captchaCheck" type="primary">Login</Button>
+  </div>
 </template>
 <script>
 import icon from "@/images/icon_ok.png";
@@ -17,7 +17,6 @@ const request = require("request");
 const { ipcRenderer, remote } = require("electron");
 //获取主进程定义的kyfwAPI对象
 const kyfwAPI = remote.getGlobal("kyfwAPI");
-var kyfwCookies = remote.getGlobal("kyfwCookies");
 //获取当前网页窗口
 const currentWindow = remote.getCurrentWindow();
 export default {
@@ -57,7 +56,7 @@ export default {
       var options = {
         hostname: kyfwAPI.root,
         path: kyfwAPI.login,
-        cookie: kyfwCookies
+        cookie: that.global.cookie
       };
       this.post(
         options,
@@ -65,10 +64,7 @@ export default {
         function(data, response) {
           if (data.result_code == 0) {
             //设置cookie
-            kyfwCookies = that.refreshCookie(
-              kyfwCookies,
-              response.headers["set-cookie"]
-            );
+            that.refreshCookie(response.headers["set-cookie"]);
             //向主进程发送用户登录事件
             ipcRenderer.send("login-event");
             //关闭当前窗口
@@ -89,10 +85,7 @@ export default {
       this.coordinates = [];
       request(kyfwAPI.getCaptchaImage, function(err, res, body) {
         //设置cookie
-        kyfwCookies = that.refreshCookie(
-          kyfwCookies,
-          res.headers["set-cookie"]
-        );
+        that.refreshCookie(res.headers["set-cookie"]);
       })
         .pipe(fs.createWriteStream(that.captchaImgPath))
         .on("close", function() {
@@ -124,7 +117,7 @@ export default {
       var options = {
         hostname: kyfwAPI.root,
         path: kyfwAPI.captchaCheck,
-        cookie: kyfwCookies
+        cookie: that.global.cookie
       };
       this.post(
         options,
