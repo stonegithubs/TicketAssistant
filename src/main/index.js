@@ -37,9 +37,9 @@ global.kyfwAPI = {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    height: 563,
+    height: 800,
     useContentSize: true,
-    width: 1000,
+    width: 1500,
     show: false
   })
   mainWindow.setMenu

@@ -1,14 +1,14 @@
 <template>
-  <div align="center">
-    <Input v-model="account" placeholder="account" style="width: 293px" />
-    <br>
-    <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
-    <br>
-    <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190"></canvas>
-    <br>
-    <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
-    <Button v-on:click="captchaCheck" type="primary">Login</Button>
-  </div>
+    <div align="center">
+        <Input v-model="account" placeholder="account" style="width: 293px" />
+        <br>
+        <Input type="password" v-model="password" placeholder="password" style="width: 293px" />
+        <br>
+        <canvas style="border:1px solid #E6E6FA" id="canvas" width="293" height="190" />
+        <br>
+        <Button v-on:click="refreshCaptcha" type="primary">Reset Captcha</Button>
+        <Button v-on:click="captchaCheck" type="primary">Login</Button>
+    </div>
 </template>
 <script>
 import icon from "@/images/icon_ok.png";
@@ -89,7 +89,10 @@ export default {
       this.coordinates = [];
       request(kyfwAPI.getCaptchaImage, function(err, res, body) {
         //设置cookie
-        kyfwCookies = that.refreshCookie(kyfwCookies, res.headers["set-cookie"]);
+        kyfwCookies = that.refreshCookie(
+          kyfwCookies,
+          res.headers["set-cookie"]
+        );
       })
         .pipe(fs.createWriteStream(that.captchaImgPath))
         .on("close", function() {
