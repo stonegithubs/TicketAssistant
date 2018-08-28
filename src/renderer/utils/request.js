@@ -8,6 +8,7 @@ export default {
                 post: function (options, content, successCallback, errorCallback) {
                     var that = this;
                     this.$Spin.show();
+                    var cookie = localStorage["cookie"];
                     var opt = {
                         hostname: options.hostname,
                         port: 443,
@@ -15,7 +16,7 @@ export default {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                            Cookie: localStorage["cookie"],
+                            Cookie: cookie == undefined ? null : cookie,
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
                             "Cache-Control": "no-cache",
                             "If-Modified-Since": "0"
@@ -46,13 +47,14 @@ export default {
                     var that = this;
                     this.$Spin.show();
                     var path = options.path + "?" + querystring.stringify(content);
+                    var cookie = localStorage["cookie"];
                     var opt = {
                         hostname: "kyfw.12306.cn",
                         port: 443,
                         path: path,
                         method: "GET",
                         headers: {
-                            Cookie: localStorage["cookie"],
+                            Cookie: cookie == undefined ? null : cookie,
                             "Cache-Control": "no-cache",
                             "If-Modified-Since": "0",
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
