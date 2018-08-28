@@ -120,6 +120,7 @@ export default {
   methods: {
     query: function() {
       var that = this;
+      var stations = this.getStations();
       var content = {
         "leftTicketDTO.train_date": "2018-09-06",
         "leftTicketDTO.from_station": "BJP",
@@ -128,16 +129,13 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.query,
-        cookie: that.global.cookie
+        path: kyfwAPI.query
       };
       this.get(
         options,
         content,
         function(data, response) {
           if (data.status) {
-            //设置cookie
-            that.refreshCookie(response.headers["set-cookie"]);
             return;
           }
           that.$Message.error(data.result_message);

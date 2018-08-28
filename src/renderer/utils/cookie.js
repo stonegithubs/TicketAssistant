@@ -5,10 +5,9 @@ export default {
             methods: {
                 //将set-cookie headers转换为cookie字符串
                 refreshCookie: function (headerCookies) {
-                    var that = this;
                     var cookieArray = [];
-                    if (that.global.cookie != null && that.global.cookie != "") {
-                        that.global.cookie.split(";").forEach((item, index) => {
+                    if (localStorage["cookie"] != null && localStorage["cookie"] != "") {
+                        localStorage["cookie"].split(";").forEach((item, index) => {
                             var splitResult = item.split("=");
                             cookieArray.push({
                                 key: splitResult[0],
@@ -42,7 +41,7 @@ export default {
                     cookieArray.forEach((item, index) => {
                         cookie += item.key + "=" + item.value + ";";
                     });
-                    that.global.cookie = cookie.substring(0, cookie.length - 1);
+                    localStorage["cookie"] = cookie.substring(0, cookie.length - 1);
                 }
             }
         });

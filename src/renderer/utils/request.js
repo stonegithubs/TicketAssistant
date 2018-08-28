@@ -15,7 +15,7 @@ export default {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-                            Cookie: options.cookie,
+                            Cookie: localStorage["cookie"],
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
                             "Cache-Control": "no-cache",
                             "If-Modified-Since": "0"
@@ -29,6 +29,8 @@ export default {
                         });
                         response.on("end", function () {
                             that.$Spin.hide();
+                            //设置cookie
+                            that.refreshCookie(response.headers["set-cookie"]);
                             var data = JSON.parse(body);
                             successCallback(data, response);
                         });
@@ -50,7 +52,7 @@ export default {
                         path: path,
                         method: "GET",
                         headers: {
-                            Cookie: options.cookie,
+                            Cookie: localStorage["cookie"],
                             "Cache-Control": "no-cache",
                             "If-Modified-Since": "0",
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
@@ -64,6 +66,8 @@ export default {
                         });
                         response.on("end", function () {
                             that.$Spin.hide();
+                            //设置cookie
+                            that.refreshCookie(response.headers["set-cookie"]);
                             var data = JSON.parse(body);
                             successCallback(data, response);
                         });

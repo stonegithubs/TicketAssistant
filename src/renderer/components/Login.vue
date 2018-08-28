@@ -56,16 +56,13 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.login,
-        cookie: that.global.cookie
+        path: kyfwAPI.login
       };
       this.post(
         options,
         content,
         function(data, response) {
           if (data.result_code == 0) {
-            //设置cookie
-            that.refreshCookie(response.headers["set-cookie"]);
             //向主进程发送用户登录事件
             ipcRenderer.send("login-event");
             //关闭当前窗口
@@ -117,8 +114,7 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.captchaCheck,
-        cookie: that.global.cookie
+        path: kyfwAPI.captchaCheck
       };
       this.post(
         options,
