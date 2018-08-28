@@ -6,7 +6,7 @@ export default {
             methods: {
                 getStations: function () {
                     var stations = [];
-                    var temp=stationNames.split("@");
+                    var temp = stationNames.split("@");
                     temp.splice(0, 1);
                     temp.forEach(item => {
                         var result = item.split("|");
