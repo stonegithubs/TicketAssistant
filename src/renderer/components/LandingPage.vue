@@ -36,15 +36,15 @@ export default {
       columns: [
         {
           title: "车次",
-          key: "name"
+          key: "stationTrainCode"
         },
         {
           title: "出发站",
-          key: "age"
+          key: "stationNameFrom"
         },
         {
           title: "到达站",
-          key: "address"
+          key: "stationNameTo"
         },
         {
           title: "出发时间",
@@ -186,64 +186,57 @@ export default {
 
       datas.forEach(element => {
         var results = element.split("|");
-
-        this.ticketInfo.remark = results[1];
-        this.ticketInfo.trainNo = results[2];
-        this.ticketInfo.stationTrainCode = results[3];
-        this.ticketInfo.stationCodeStart = results[4];
-        this.ticketInfo.stationCodeEnd = results[5];
-        this.ticketInfo.stationCodeFrom = results[6];
-        this.ticketInfo.stationCodeTo = results[7];
-        this.ticketInfo.startTime = results[8];
-        this.ticketInfo.arriveTime = results[9];
-        this.ticketInfo.period = results[10];
-        this.ticketInfo.buy = results[11];
-        this.ticketInfo.ypInfo = results[12];
-        this.ticketInfo.startDate = results[13];
-        this.ticketInfo.trainSeatFeature = results[14];
-        this.ticketInfo.locationCode = results[15];
-        this.ticketInfo.stationNoFrom = results[16];
-        this.ticketInfo.stationNoTo = results[17];
-        this.ticketInfo.supportCard = results[18];
-        this.ticketInfo.controlledTrainFlag = results[19];
-        //cu.gg_num = currentDataArray[20] ? currentDataArray[20] : "--";
-        this.ticketInfo.highSoftSleeperResidualTicketCount = results[21]
-          ? results[21]
-          : "--";
-        this.ticketInfo.otherResidualTicketCount = results[22] ? results[22] : "--";
-        this.ticketInfo.softSleeperResidualTicketCount = results[23]
-          ? results[23]
-          : "--";
-        this.ticketInfo.softSeatResidualTicketCount = results[24]
-          ? results[24]
-          : "--";
-        //cu.tz_num = currentDataArray[25] ? currentDataArray[25] : "--";
-        this.ticketInfo.noSeatResidualTicketCount = results[26] ? results[26] : "--";
-        //cu.yb_num = currentDataArray[27] ? currentDataArray[27] : "--";
-        this.ticketInfo.sleeperResidualTicketCount = results[28]
-          ? results[28]
-          : "--";
-        this.ticketInfo.seatResidualTicketCount = results[29] ? results[29] : "--";
-        this.ticketInfo.secondSeatResidualTicketCount = results[30]
-          ? results[30]
-          : "--";
-        this.ticketInfo.firstSeatResidualTicketCount = results[31]
-          ? results[31]
-          : "--";
-        this.ticketInfo.businessSeatResidualTicketCount = results[32]
-          ? results[32]
-          : "--";
-        this.ticketInfo.dongSleeperResidualTicketCount = results[33]
-          ? results[33]
-          : "--";
-        //cu.yp_ex = currentDataArray[34];
-        this.ticketInfo.seatType = results[35];
-        //cu.exchange_train_flag = currentDataArray[36];
-        //cu.from_station_name = cv[currentDataArray[6]];
-        //cu.to_station_name = cv[currentDataArray[7]];
-        //cw.queryLeftNewDTO = cu;
-        //var stationInfo = Enumerable.From(stations).firstOrDefault();
-        ticketInfos.push(this.ticketInfo);
+        var ticketInfoModel = {
+          remark: results[1],
+          trainNo: results[2],
+          stationTrainCode: results[3],
+          stationCodeStart: results[4],
+          stationCodeEnd: results[5],
+          stationCodeFrom: results[6],
+          stationCodeTo: results[7],
+          startTime: results[8],
+          arriveTime: results[9],
+          period: results[10],
+          buy: results[11],
+          ypInfo: results[12],
+          startDate: results[13],
+          trainSeatFeature: results[14],
+          locationCode: results[15],
+          stationNoFrom: results[16],
+          stationNoTo: results[17],
+          supportCard: results[18],
+          controlledTrainFlag: results[19],
+          //gg_num : results[20] ? results[20] : "--";
+          highSoftSleeperResidualTicketCount: results[21] ? results[21] : "--",
+          otherResidualTicketCount: results[22] ? results[22] : "--",
+          softSleeperResidualTicketCount: results[23] ? results[23] : "--",
+          softSeatResidualTicketCount: results[24] ? results[24] : "--",
+          //tz_num : results[25] ? results[25] : "--";
+          noSeatResidualTicketCount: results[26] ? results[26] : "--",
+          //yb_num : results[27] ? results[27] : "--";
+          sleeperResidualTicketCount: results[28] ? results[28] : "--",
+          seatResidualTicketCount: results[29] ? results[29] : "--",
+          secondSeatResidualTicketCount: results[30] ? results[30] : "--",
+          firstSeatResidualTicketCount: results[31] ? results[31] : "--",
+          businessSeatResidualTicketCount: results[32] ? results[32] : "--",
+          dongSleeperResidualTicketCount: results[33] ? results[33] : "--",
+          //yp_ex = results[34];
+          seatType: results[35],
+          //exchange_train_flag = results[36];
+          stationNameFrom: null,
+          stationNameTo: null
+        };
+        ticketInfoModel.stationNameFrom = Enumerable.from(
+          stations
+        ).firstOrDefault(
+          item => item.code == ticketInfoModel.stationCodeFrom
+        ).name;
+        ticketInfoModel.stationNameTo = Enumerable.from(
+          stations
+        ).firstOrDefault(
+          item => item.code == ticketInfoModel.stationCodeTo
+        ).name;
+        ticketInfos.push(ticketInfoModel);
       });
       return ticketInfos;
     },
@@ -265,7 +258,7 @@ export default {
         content,
         function(data, response) {
           if (data.status) {
-            var a=that.analyzeResult(data.data.result);
+            that.data = that.analyzeResult(data.data.result);
             return;
           }
           that.$Message.error(data.result_message);
