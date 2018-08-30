@@ -287,6 +287,18 @@ export default {
     },
     query: function() {
       var that = this;
+      if (that.departureDate == "") {
+        that.$Message.error("请选择出发日期");
+        return;
+      }
+      if (that.fromStationCode == "") {
+        that.$Message.error("请选择出发站");
+        return;
+      }
+      if (that.toStationCode == "") {
+        that.$Message.error("请选择到达站");
+        return;
+      }
 
       var content = {
         "leftTicketDTO.train_date": that.getNowFormatDate(that.departureDate),
@@ -306,10 +318,18 @@ export default {
             that.data = that.analyzeResult(data.data.result);
             return;
           }
-          that.$Message.error(data.result_message);
+          that.$Message.error({
+            content: data.result_message,
+            duration: 10,
+            closable: true
+          });
         },
         function(e) {
-          that.$Message.error(e.message);
+          that.$Message.error({
+            content: e.message,
+            duration: 10,
+            closable: true
+          });
         }
       );
     },

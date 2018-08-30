@@ -68,6 +68,11 @@ export default {
                         });
                         response.on("end", function () {
                             that.$Spin.hide();
+                            if (response.status != 200) {
+                                var e = { message: "请求数据失败:" + response.status }
+                                errorCallback(e);
+                                return;
+                            }
                             //设置cookie
                             that.refreshCookie(response.headers["set-cookie"]);
                             var data = JSON.parse(body);
