@@ -3,8 +3,21 @@
 <template>
   <div class="layout">
     <Layout>
-      <Header style="background:white">
-      </Header>
+      <Row>
+        <Col span="12" style="padding-right:10px">
+        <Select v-model="fromStationCode" filterable remote :remote-method="searchFromStation" placeholder="请选择出发站">
+          <Option v-for="item in fromSearchStationResult" :value="item.code" :key="item.code">{{ item.name }}</Option>
+        </Select>
+        </Col>
+        <Col span="12" style="padding-right:10px">
+        <Select v-model="toStationCode" filterable remote :remote-method="searchToStation" placeholder="请选择到达站">
+          <Option v-for="item in toSearchStationResult" :value="item.code" :key="item.code">{{ item.name }}</Option>
+        </Select>
+        </Col>
+        <Col span="12">
+        <DatePicker v-model="departureDate" type="date" placeholder="选择出发日期" style="width: 200px"></DatePicker>
+        </Col>
+      </Row>
       <Content>
         <Checkbox>GC-高铁/城际</Checkbox>
         <Checkbox>D-动车</Checkbox>
@@ -33,6 +46,12 @@ var Enumerable = require("linq");
 export default {
   data() {
     return {
+      fromSearchStationResult: [],
+      toSearchStationResult: [],
+      fromStationCode: "",
+      toStationCode: "",
+      departureDate: "",
+      stations: [],
       columns: [
         {
           title: "车次",
@@ -177,13 +196,39 @@ export default {
     ipcRenderer.on("login-event", (event, arg) => {
       that.$Message.info("您已成功登录");
     });
+    this.stations = this.getStations();
     //this.showLogin();
   },
   methods: {
+    getNowFormatDate: function(date) {
+      var seperator = "-";
+      var year = date.getFullYear();
+      var month = date.getMonth() + 1;
+      var strDate = date.getDate();
+      if (month >= 1 && month <= 9) {
+        month = "0" + month;
+      }
+      if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+      }
+      var currentdate = year + seperator + month + seperator + strDate;
+      return currentdate;
+    },
+    searchFromStation: function(value) {
+      var that = this;
+      this.fromSearchStationResult = Enumerable.from(that.stations)
+        .where(item => item.name.indexOf(value) > -1)
+        .toArray();
+    },
+    searchToStation: function(value) {
+      var that = this;
+      this.toSearchStationResult = Enumerable.from(that.stations)
+        .where(item => item.name.indexOf(value) > -1)
+        .toArray();
+    },
     analyzeResult: function(datas) {
+      var that = this;
       var ticketInfos = [];
-      var stations = this.getStations();
-
       datas.forEach(element => {
         var results = element.split("|");
         var ticketInfoModel = {
@@ -227,12 +272,12 @@ export default {
           stationNameTo: null
         };
         ticketInfoModel.stationNameFrom = Enumerable.from(
-          stations
+          that.stations
         ).firstOrDefault(
           item => item.code == ticketInfoModel.stationCodeFrom
         ).name;
         ticketInfoModel.stationNameTo = Enumerable.from(
-          stations
+          that.stations
         ).firstOrDefault(
           item => item.code == ticketInfoModel.stationCodeTo
         ).name;
@@ -244,9 +289,9 @@ export default {
       var that = this;
 
       var content = {
-        "leftTicketDTO.train_date": "2018-09-06",
-        "leftTicketDTO.from_station": "BJP",
-        "leftTicketDTO.to_station": "SHH",
+        "leftTicketDTO.train_date": that.getNowFormatDate(that.departureDate),
+        "leftTicketDTO.from_station": that.fromStationCode,
+        "leftTicketDTO.to_station": that.toStationCode,
         purpose_codes: "ADULT"
       };
       var options = {
