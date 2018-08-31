@@ -65,6 +65,7 @@ export default {
           if (data.result_code == 0) {
             //向主进程发送用户登录事件
             ipcRenderer.send("login-event");
+            localStorage["loginFlag"] = true;
             //关闭当前窗口
             currentWindow.close();
             return;

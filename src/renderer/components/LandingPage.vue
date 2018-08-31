@@ -123,11 +123,36 @@ export default {
         },
         {
           title: "操作",
-          key: "remark"
+          key: "remark",
+          fixed: "right",
+          render: (h, params) => {
+            return h("div", [
+              h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small"
+                  },
+                  style: {
+                    marginRight: "5px"
+                  },
+                  on: {
+                    click: () => {
+                      this.preOrder(params.row);
+                    }
+                  }
+                },
+                params.row.remark
+              )
+            ]);
+          }
         }
       ],
       data: [],
       ticketInfo: {
+        //凭证
+        secret: null,
         //列车唯一编号
         trainNo: null,
         //本次列车站点车次码
@@ -197,7 +222,6 @@ export default {
       that.$Message.info("您已成功登录");
     });
     this.stations = this.getStations();
-    //this.showLogin();
   },
   methods: {
     getNowFormatDate: function(date) {
@@ -232,6 +256,7 @@ export default {
       datas.forEach(element => {
         var results = element.split("|");
         var ticketInfoModel = {
+          secret: results[0],
           remark: results[1],
           trainNo: results[2],
           stationTrainCode: results[3],
@@ -284,6 +309,56 @@ export default {
         ticketInfos.push(ticketInfoModel);
       });
       return ticketInfos;
+    },
+    preOrder: function(row) {
+      var that = this;
+      if (
+        localStorage["loginFlag"] == undefined ||
+        localStorage["loginFlag"] == false
+      ) {
+        that.$Message.info("请先登录");
+        that.showLogin();
+        return;
+      }
+      var content = {
+        secretStr: row.secret,
+        train_date: that.getNowFormatDate(that.departureDate),
+        back_train_date: that.getNowFormatDate(new Date()),
+        tour_flag: "dc",
+        purpose_codes: "ADULT",
+        query_from_station_name: Enumerable.from(that.stations).firstOrDefault(
+          item => item.code == that.fromStationCode
+        ).name,
+        query_to_station_name: Enumerable.from(that.stations).firstOrDefault(
+          item => item.code == that.toStationCode
+        ).name
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: kyfwAPI.preOrder
+      };
+      this.post(
+        options,
+        content,
+        function(data, response) {
+          console.log(data);
+          if (data.status) {
+            return;
+          }
+          that.$Message.error({
+            content: data.result_message,
+            duration: 10,
+            closable: true
+          });
+        },
+        function(e) {
+          that.$Message.error({
+            content: e.message,
+            duration: 10,
+            closable: true
+          });
+        }
+      );
     },
     query: function() {
       var that = this;

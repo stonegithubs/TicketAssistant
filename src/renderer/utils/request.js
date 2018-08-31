@@ -19,7 +19,8 @@ export default {
                             Cookie: cookie == undefined ? null : cookie,
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
                             "Cache-Control": "no-cache",
-                            "If-Modified-Since": "0"
+                            "If-Modified-Since": "0",
+                            "X-Requested-With": "XMLHttpRequest"
                         }
                     };
                     var request = https.request(opt, function (response) {
@@ -30,6 +31,11 @@ export default {
                         });
                         response.on("end", function () {
                             that.$Spin.hide();
+                            if (response.statusCode != 200) {
+                                var e = { message: "请求数据失败:" + response.status }
+                                errorCallback(e);
+                                return;
+                            }
                             //设置cookie
                             that.refreshCookie(response.headers["set-cookie"]);
                             var data = JSON.parse(body);
@@ -49,7 +55,7 @@ export default {
                     var path = options.path + "?" + querystring.stringify(content);
                     var cookie = localStorage["cookie"];
                     var opt = {
-                        hostname: "kyfw.12306.cn",
+                        hostname: options.hostname,
                         port: 443,
                         path: path,
                         method: "GET",
@@ -57,7 +63,8 @@ export default {
                             Cookie: cookie == undefined ? null : cookie,
                             "Cache-Control": "no-cache",
                             "If-Modified-Since": "0",
-                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36"
+                            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
+                            "X-Requested-With": "XMLHttpRequest"
                         }
                     };
                     var request = https.request(opt, (response) => {
@@ -68,7 +75,7 @@ export default {
                         });
                         response.on("end", function () {
                             that.$Spin.hide();
-                            if (response.status != 200) {
+                            if (response.statusCode != 200) {
                                 var e = { message: "请求数据失败:" + response.status }
                                 errorCallback(e);
                                 return;

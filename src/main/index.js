@@ -30,7 +30,8 @@ global.kyfwAPI = {
   getCaptchaImage: global.root + "/passport/captcha/captcha-image?login_site=E&module=login&rand=sjrand",
   captchaCheck: "/passport/captcha/captcha-check",
   login: "/passport/web/login",
-  query: "/otn/leftTicket/query"
+  query: "/otn/leftTicket/query",
+  preOrder: "otn/leftTicket/submitOrderRequest"
 }
 
 
