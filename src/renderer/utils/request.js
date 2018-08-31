@@ -32,7 +32,7 @@ export default {
                         response.on("end", function () {
                             that.$Spin.hide();
                             if (response.statusCode != 200) {
-                                var e = { message: "请求数据失败:" + response.status }
+                                var e = { message: "请求数据失败:" + response.statusCode }
                                 errorCallback(e);
                                 return;
                             }
@@ -76,7 +76,7 @@ export default {
                         response.on("end", function () {
                             that.$Spin.hide();
                             if (response.statusCode != 200) {
-                                var e = { message: "请求数据失败:" + response.status }
+                                var e = { message: "请求数据失败:" + response.statusCode }
                                 errorCallback(e);
                                 return;
                             }

@@ -31,7 +31,7 @@ global.kyfwAPI = {
   captchaCheck: "/passport/captcha/captcha-check",
   login: "/passport/web/login",
   query: "/otn/leftTicket/query",
-  preOrder: "otn/leftTicket/submitOrderRequest"
+  preOrder: "/otn/leftTicket/submitOrderRequest"
 }
 
 

@@ -341,15 +341,45 @@ export default {
         options,
         content,
         function(data, response) {
-          console.log(data);
           if (data.status) {
             return;
           }
           that.$Message.error({
-            content: data.result_message,
+            content: data.messages,
             duration: 10,
             closable: true
           });
+        },
+        function(e) {
+          that.$Message.error({
+            content: e.message,
+            duration: 10,
+            closable: true
+          });
+        }
+      );
+    },
+    ticketQuery: function(address) {
+      var that = this;
+      var content = {
+        "leftTicketDTO.train_date": that.getNowFormatDate(that.departureDate),
+        "leftTicketDTO.from_station": that.fromStationCode,
+        "leftTicketDTO.to_station": that.toStationCode,
+        purpose_codes: "ADULT"
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: address
+      };
+      this.get(
+        options,
+        content,
+        function(data, response) {
+          if (data.status) {
+            that.data = that.analyzeResult(data.data.result);
+            return;
+          }
+          that.ticketQuery("/otn/" + data.c_url);
         },
         function(e) {
           that.$Message.error({
@@ -374,39 +404,7 @@ export default {
         that.$Message.error("请选择到达站");
         return;
       }
-
-      var content = {
-        "leftTicketDTO.train_date": that.getNowFormatDate(that.departureDate),
-        "leftTicketDTO.from_station": that.fromStationCode,
-        "leftTicketDTO.to_station": that.toStationCode,
-        purpose_codes: "ADULT"
-      };
-      var options = {
-        hostname: kyfwAPI.root,
-        path: kyfwAPI.query
-      };
-      this.get(
-        options,
-        content,
-        function(data, response) {
-          if (data.status) {
-            that.data = that.analyzeResult(data.data.result);
-            return;
-          }
-          that.$Message.error({
-            content: data.result_message,
-            duration: 10,
-            closable: true
-          });
-        },
-        function(e) {
-          that.$Message.error({
-            content: e.message,
-            duration: 10,
-            closable: true
-          });
-        }
-      );
+      that.ticketQuery(kyfwAPI.query);
     },
     showLogin: function() {
       //定义一个子窗口,继承自主渲染进程
