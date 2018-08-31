@@ -4,17 +4,17 @@
   <div class="layout">
     <Layout>
       <Row>
-        <Col span="12" style="padding-right:10px">
-        <Select v-model="fromStationCode" filterable remote :remote-method="searchFromStation" placeholder="请选择出发站">
+        <Col span="12" style="width:15%">
+        <Select v-model="fromStationCode" filterable remote :remote-method="searchFromStation" placeholder="请选择出发站" style="width: 200px">
           <Option v-for="item in fromSearchStationResult" :value="item.code" :key="item.code">{{ item.name }}</Option>
         </Select>
         </Col>
-        <Col span="12" style="padding-right:10px">
-        <Select v-model="toStationCode" filterable remote :remote-method="searchToStation" placeholder="请选择到达站">
+        <Col span="12" style="width:15%">
+        <Select v-model="toStationCode" filterable remote :remote-method="searchToStation" placeholder="请选择到达站" style="width: 200px">
           <Option v-for="item in toSearchStationResult" :value="item.code" :key="item.code">{{ item.name }}</Option>
         </Select>
         </Col>
-        <Col span="12">
+        <Col span="12" style="width:15%">
         <DatePicker v-model="departureDate" type="date" placeholder="选择出发日期" style="width: 200px"></DatePicker>
         </Col>
       </Row>
@@ -132,7 +132,8 @@ export default {
                 {
                   props: {
                     type: "primary",
-                    size: "small"
+                    size: "small",
+                    style:"width: 200px"
                   },
                   style: {
                     marginRight: "5px"
