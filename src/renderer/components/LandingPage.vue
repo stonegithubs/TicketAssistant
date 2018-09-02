@@ -133,7 +133,7 @@ export default {
                   props: {
                     type: "primary",
                     size: "small",
-                    style:"width: 200px"
+                    style: "width: 200px"
                   },
                   style: {
                     marginRight: "5px"
@@ -392,6 +392,9 @@ export default {
       );
     },
     query: function() {
+      localStorage["proxy_host"] = "127.0.0.1";
+      localStorage["proxy_port"] = "1080";
+      localStorage["proxy"] = false;
       var that = this;
       if (that.departureDate == "") {
         that.$Message.error("请选择出发日期");
