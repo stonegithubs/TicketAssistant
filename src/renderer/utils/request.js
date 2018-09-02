@@ -2,6 +2,7 @@ import Vue from "vue";
 const https = require("https");
 const http = require("http");
 const querystring = require("querystring");
+const HttpsProxyAgent = require("https-proxy-agent");
 const tls = require("tls");
 const zlib = require('zlib');
 export default {
@@ -69,7 +70,7 @@ export default {
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
                             "X-Requested-With": "XMLHttpRequest",
                             "Host": options.hostname,
-                            "Accept-Encoding": "gzip"
+                            "Accept-Encoding": "gzip, deflate, br"
                         }
                     };
                     //是否启用代理
@@ -164,6 +165,7 @@ export default {
                         });
                         response.on("end", function () {
                             that.$Spin.hide();
+                            console.log(response.headers["content-encoding"]);
                             if (response.statusCode != 200) {
                                 var e = { message: "请求数据失败:" + response.statusCode }
                                 errorCallback(e);
