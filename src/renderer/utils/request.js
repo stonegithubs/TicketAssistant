@@ -13,6 +13,7 @@ export default {
                     var that = this;
                     this.$Spin.show();
                     var cookie = localStorage["cookie"];
+                    console.log(cookie);
                     var opt = {
                         hostname: options.hostname,
                         port: 443,
@@ -58,6 +59,7 @@ export default {
                     this.$Spin.show();
                     var path = options.path + "?" + querystring.stringify(content);
                     var cookie = localStorage["cookie"];
+                    console.log(cookie);
                     var opt = {
                         hostname: options.hostname,
                         port: 443,
@@ -69,8 +71,7 @@ export default {
                             "If-Modified-Since": "0",
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
                             "X-Requested-With": "XMLHttpRequest",
-                            "Host": options.hostname,
-                            "Accept-Encoding": "gzip, deflate, br"
+                            "Host": options.hostname
                         }
                     };
                     //是否启用代理

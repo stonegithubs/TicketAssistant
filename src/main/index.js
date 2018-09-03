@@ -20,7 +20,7 @@ ipcMain.on("login-event", (event, arg) => {
   mainWindow.webContents.send("login-event")
 })
 
-
+localStorage.clear();
 //定义全局变量
 global.mainURL = winURL;
 global.root = "https://kyfw.12306.cn";
@@ -31,7 +31,9 @@ global.kyfwAPI = {
   captchaCheck: "/passport/captcha/captcha-check",
   login: "/passport/web/login",
   query: "/otn/leftTicket/queryA",
-  preOrder: "/otn/leftTicket/submitOrderRequest"
+  preOrder: "/otn/leftTicket/submitOrderRequest",
+  uamtk: "/passport/web/auth/uamtk",
+  uamauthclient: "/otn/uamauthclient"
 }
 
 

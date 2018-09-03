@@ -63,6 +63,62 @@ export default {
         content,
         function(data, response) {
           if (data.result_code == 0) {
+            that.uamtk();
+            return;
+          }
+          that.$Message.error(data.result_message);
+          //登录失败重新刷新验证码
+          that.refreshCaptcha();
+        },
+        function(e) {
+          that.$Message.error(e.message);
+          //登录失败重新刷新验证码
+          that.refreshCaptcha();
+        }
+      );
+    },
+    uamtk: function() {
+      var that = this;
+      var content = {
+        appid: "otn"
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: kyfwAPI.uamtk
+      };
+      this.post(
+        options,
+        content,
+        function(data, response) {
+          if (data.result_code == 0) {
+            that.uamauthClient(data.newapptk);
+            return;
+          }
+          that.$Message.error(data.result_message);
+          //登录失败重新刷新验证码
+          that.refreshCaptcha();
+        },
+        function(e) {
+          that.$Message.error(e.message);
+          //登录失败重新刷新验证码
+          that.refreshCaptcha();
+        }
+      );
+    },
+    uamauthClient: function(apptk) {
+      var that = this;
+      var content = {
+        tk: apptk
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: kyfwAPI.uamauthclient
+      };
+      this.post(
+        options,
+        content,
+        function(data, response) {
+          if (data.result_code == 0) {
             //向主进程发送用户登录事件
             ipcRenderer.send("login-event");
             localStorage["loginFlag"] = true;
@@ -76,6 +132,8 @@ export default {
         },
         function(e) {
           that.$Message.error(e.message);
+          //登录失败重新刷新验证码
+          that.refreshCaptcha();
         }
       );
     },
