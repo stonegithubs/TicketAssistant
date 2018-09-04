@@ -225,20 +225,6 @@ export default {
     this.stations = this.getStations();
   },
   methods: {
-    getNowFormatDate: function(date) {
-      var seperator = "-";
-      var year = date.getFullYear();
-      var month = date.getMonth() + 1;
-      var strDate = date.getDate();
-      if (month >= 1 && month <= 9) {
-        month = "0" + month;
-      }
-      if (strDate >= 0 && strDate <= 9) {
-        strDate = "0" + strDate;
-      }
-      var currentdate = year + seperator + month + seperator + strDate;
-      return currentdate;
-    },
     searchFromStation: function(value) {
       var that = this;
       this.fromSearchStationResult = Enumerable.from(that.stations)
@@ -311,38 +297,26 @@ export default {
       });
       return ticketInfos;
     },
-    preOrder: function(row) {
+    checkUser: function(callback) {
       var that = this;
-      if (
-        localStorage["loginFlag"] == undefined ||
-        localStorage["loginFlag"] == false
-      ) {
-        that.$Message.info("请先登录");
-        that.showLogin();
-        return;
-      }
       var content = {
-        secretStr: row.secret,
-        train_date: that.getNowFormatDate(that.departureDate),
-        back_train_date: that.getNowFormatDate(new Date()),
-        tour_flag: "dc",
-        purpose_codes: "ADULT",
-        query_from_station_name: Enumerable.from(that.stations).firstOrDefault(
-          item => item.code == that.fromStationCode
-        ).name,
-        query_to_station_name: Enumerable.from(that.stations).firstOrDefault(
-          item => item.code == that.toStationCode
-        ).name
+        _json_att: ""
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.preOrder
+        path: kyfwAPI.checkUser
       };
       this.post(
         options,
         content,
         function(data, response) {
           if (data.status) {
+            if (!data.data.flag) {
+              that.$Message.info("请先登录");
+              that.showLogin();
+              return;
+            }
+            callback();
             return;
           }
           that.$Message.error({
@@ -360,6 +334,72 @@ export default {
         }
       );
     },
+    submitOrderRequest: function(secret) {
+      var that = this;
+      var content = {
+        secretStr: secret,
+        train_date: that.getNowFormatDate(that.departureDate),
+        back_train_date: that.getNowFormatDate(new Date()),
+        tour_flag: "dc",
+        purpose_codes: "ADULT",
+        query_from_station_name: Enumerable.from(that.stations).firstOrDefault(
+          item => item.code == that.fromStationCode
+        ).name,
+        query_to_station_name: Enumerable.from(that.stations).firstOrDefault(
+          item => item.code == that.toStationCode
+        ).name,
+        undefined: null
+      };
+      var options = {
+        hostname: kyfwAPI.root,
+        path: kyfwAPI.submitOrderRequest,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          Accept: "*/*"
+        }
+      };
+      this.post(
+        options,
+        content,
+        function(data, response) {
+          if (data.status) {
+            //Y表示离开车时间很近
+            if (data.data == "Y") {
+              that.$Message.info("验证成功");
+              return;
+            }
+            //N无需提示
+            that.$Message.info("验证失败");
+          }
+          that.$Message.error({
+            content: data.messages,
+            duration: 10,
+            closable: true
+          });
+        },
+        function(e) {
+          that.$Message.error({
+            content: e.message,
+            duration: 10,
+            closable: true
+          });
+        }
+      );
+    },
+    preOrder: function(row) {
+      var that = this;
+      if (
+        localStorage["loginFlag"] == undefined ||
+        localStorage["loginFlag"] == false
+      ) {
+        that.$Message.info("请先登录");
+        that.showLogin();
+        return;
+      }
+      this.checkUser(function() {
+        that.submitOrderRequest(row.secret);
+      });
+    },
     ticketQuery: function(address) {
       var that = this;
       var content = {
@@ -370,7 +410,11 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: address
+        path: address,
+        headers: {
+          "Cache-Control": "no-cache",
+          "If-Modified-Since": "0"
+        }
       };
       this.get(
         options,

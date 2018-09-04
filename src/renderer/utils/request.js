@@ -12,22 +12,23 @@ export default {
                 post: function (options, content, successCallback, errorCallback) {
                     var that = this;
                     this.$Spin.show();
+                    //this.$Spin.hide();
                     var cookie = localStorage["cookie"];
-                    console.log(cookie);
                     var opt = {
                         hostname: options.hostname,
                         port: 443,
                         path: options.path,
                         method: "POST",
                         headers: {
-                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
                             Cookie: cookie == undefined ? null : cookie,
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
-                            "Cache-Control": "no-cache",
-                            "If-Modified-Since": "0",
-                            "X-Requested-With": "XMLHttpRequest"
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Host": options.hostname
                         }
                     };
+                    opt.headers = this.mergeObject([opt.headers, options.headers])
+                    console.log(opt.headers);
+                    console.log(content);
                     var request = https.request(opt, function (response) {
                         response.setEncoding("utf8");
                         var body = "";
@@ -47,6 +48,7 @@ export default {
                             successCallback(data, response);
                         });
                     });
+                    //request.write(content);
                     request.write(querystring.stringify(content));
                     request.on("error", function (e) {
                         that.$Spin.hide();
@@ -67,13 +69,12 @@ export default {
                         method: "GET",
                         headers: {
                             Cookie: cookie == undefined ? null : cookie,
-                            "Cache-Control": "no-cache",
-                            "If-Modified-Since": "0",
                             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36",
                             "X-Requested-With": "XMLHttpRequest",
                             "Host": options.hostname
                         }
                     };
+                    opt.headers = this.mergeObject([opt.headers, options.headers])
                     //是否启用代理
                     var proxy = localStorage["proxy"];
                     if (proxy == true || proxy == "true") {

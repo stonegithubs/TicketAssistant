@@ -56,7 +56,10 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.login
+        path: kyfwAPI.login,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        }
       };
       this.post(
         options,
@@ -84,7 +87,10 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.uamtk
+        path: kyfwAPI.uamtk,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        }
       };
       this.post(
         options,
@@ -112,7 +118,10 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.uamauthclient
+        path: kyfwAPI.uamauthclient,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        }
       };
       this.post(
         options,
@@ -173,7 +182,10 @@ export default {
       };
       var options = {
         hostname: kyfwAPI.root,
-        path: kyfwAPI.captchaCheck
+        path: kyfwAPI.captchaCheck,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+        }
       };
       this.post(
         options,

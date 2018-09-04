@@ -9,11 +9,13 @@ import 'iview/dist/styles/iview.css';
 import https from './utils/request';
 import cookie from './utils/cookie';
 import station from './utils/station';
+import util from './utils/util';
 
 Vue.use(iView);
 Vue.use(https);
 Vue.use(cookie);
 Vue.use(station);
+Vue.use(util);
 
 if (!process.env.IS_WEB) Vue.use(require('vue-electron'))
 Vue.http = Vue.prototype.$http = axios
